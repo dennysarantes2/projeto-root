@@ -1,0 +1,56 @@
+
+<html>
+
+<head th:replace="~{base :: head}"></head>
+
+
+<body>
+<div th:replace="~{base :: logo-sistema }"></div>
+	<div class="container">
+		
+		<div th:replace="~{base :: jumb('Cadastro de usuario')}"></div>
+		
+			<div class="card">
+			<form th:object="${requisicaoNovoUsuario}" class="card-body" th:action="@{/usuario/cadastro}" method="post">
+				<div class="form-group">
+					<label for="username">Nome</label>
+					<input th:field="*{username}" th:errorclass="is-invalid"  class="form-control" placeholder="nome do usuario"> 
+					<small>Informe o nome do usuário a ser cadastrado</small>
+					<div class="invalid-feedback"  th:errors="*{username}">
+						Msg de erro ao deixar o campo em branco!
+					</div>
+					<div th:hidden="${usuarioJaExistente} != true ? 'true'" style="color:red;" >
+						Usuario já existe!
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="password">Senha</label>
+					<input th:field="*{password}" th:errorclass="is-invalid" class="form-control" placeholder="Insira a senha"> 
+					<small>Crie uma senha!</small>
+					<div class="invalid-feedback"  th:errors="*{password}">
+						Msg de erro ao deixar o campo em branco!
+					</div>
+					
+				</div>
+				
+					<div class="input-group mb-3">
+					<label class="input-group-text" for="enabled">Perfil do usuario</label> 
+						<select th:field="*{authority}"
+						class="form-select" id="Roles">
+						<option value="" >Escolha...</option>
+						<option value="ROLE_ADM">Administrador</option>
+						<option value="ROLE_USR">Usuario comum</option>
+					</select> 
+				</div>
+				<input th:field="*{authority}" th:errorclass="is-invalid" class="form-control" hidden>
+				<div class="invalid-feedback" th:errors="*{authority}">Msg de erro de Roles</div>
+				</div>
+				<button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Cadastrar</button>
+				<button class="btn btn-outline-primary my-2 my-sm-0" type="reset">Limpar</button>
+			</form>
+		</div>
+
+	</div>
+
+</body>
+</html>

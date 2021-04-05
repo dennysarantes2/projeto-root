@@ -1,0 +1,97 @@
+######Para fazer o deploy da aplicação Spring com Maven#####
+
+=====> Deploy - .JAR
+	
+	Fazendo pelo Eclipse
+		1- Clicar com o botão direito sobre o projeto>Run as> Maven build...
+		2- No campo Goals> "clean package"
+		OU
+		1- Clicar com o botão direito sobre o projeto>Run as> Maven install
+		
+	Fazendo pelo prompt
+		1- Acessar o diretório do projeto no workspace
+		2- executar o comando: "mvn clean package"
+		
+	O .Jar será criado dentro da pasta target do projeto
+	Para executar o .Jar gerado, basta executar o seguinte comando: "java -jar nome_arquivo.jar"
+	
+===> Como colocar as configurações (senhas e dados sensíveis) em variáveis de ambiente
+	1- Criar um application.properties específico para produção: application-prod.properties 
+	2- Os dados que forem sensíveis deverão ser substituídos pela expressão ${NOME_VARIAVEL} 
+	3- Na hora de rodar(quiser subir a aplicação), fazer o seguinte no prompt:
+			export nome_variavel=valor  (No prompt colocar os nomes de todas as variáveis seguidos dos respectivos valores)
+			java -jar -Dspring.profiles.active=prod nome_arquivo.jar 
+			
+====>  Deploy - .WAR
+	São necessárias 3 coisas
+		1- Acessar o arquivo pom.xml
+		2- Incluir, antes de properties, a linha <packaging>war</packaging>
+		3- Incluir a dependência:
+					<dependency>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-starter-tomcat</artifactId>
+						<scope>provided</scope>
+					</dependency>
+		4- Na classe MAIN, fazer extends da classe SpringBootServletInitializer
+		5- Na classe MAIN já extendida, sobrescrever o método SpringApplicationBuilder configure
+		6- alterar o return para builder.sources(NomeDaClasse.class)
+		7- Depois rodar o maven com os mesmos comandos acima, incluindo o Dspring.profiles e as variáveis.
+	
+====> deploy Docker
+
+	1- clicar com botão direito sobre o projeto > New file
+	2- dar o nome de Dockerfile
+	3- Dentro do arquivo inserir:
+		FROM openjdk:8-jdk-alpine
+		RUN addgroup -S spring && adduser -S spring -G spring
+		USER spring:spring
+		ARG JAR_FILE=target/*.jar
+		COPY ${JAR_FILE} app.jar
+		ENTRYPOINT ["java","-jar","/app.jar"]
+	4- Baixar e copiar para a pasta raiz o openjdk
+	4- Pelo prompt, com o docker instalado, entrar no diretório raiz do projeto
+	5- Rodar o comando para criar a imagem docker do projeto: docker build -t "alura/forum" .
+	6- Para verificar se a imagem foi criada, rode o comando docker image list
+	7- Para rodar o conteiner, rode o comando: 
+			docker run -p 8080:8080
+			 -e SPRING_PROFILES_ACTIVE='prod'
+			 -e FORUM_DATABASE_URL:'jdbc:h2:mem:alura-forum'
+			 -e FORUM_DATABASE_USERNAME='sa'
+			 -e FORUM_DATABASE_PASSWORD=''
+			 -e FORUM_JWT_SECRET='123456'
+			 alura/forum
+
+
+===> Deploy no HEROKU (provedor na nuvem)
+	1- Acessar devcenter.heroku.com e fazer a conta gratuita
+	2- Baixar e instalar o aplicativo CI line (ferramenta de linha de comando)
+	3- Entrar na pasta raiz do projeto
+	4- rodar o comando: heroku login  (fazer a autenticação via browser)
+	5- rodar o comando: heroku container:login
+	6- (opcional) Rodar o comando para clonar o projeto do git para a sua máquina local: git clone URL
+	7- rodar o comando a seguir para criar a aplicação: heroku create nomeAplicacao
+	8- (caso não tenha executado o passo 6) Rodar o comando: heroku git:remote -a nomeAplicacao (NOME DA APLICAÇÃO DADO NO PASSO 7)
+	9- Como a conta no heroku é gratuita, há uma limitação de 512M de memória, 
+		então esse parâmetro deve ser inserido no docker file, além do parâmetro da porta, conforme abaixo:
+			FROM openjdk:8-jdk-alpine
+			RUN addgroup -S spring && adduser -S spring -G spring
+			USER spring:spring
+			ARG JAR_FILE=target/*.jar
+			COPY ${JAR_FILE} app.jar
+			ENTRYPOINT ["java","-Xmx512m","-Dserver.port=${PORT}","-jar","/app.jar"]
+			
+	10- Incluir no arquivo application-prod.properties a seguinte linha:
+			server.port=8080
+	11- Entrar no endereço: dashboard.heroku.com/apps/nomeAplicacao
+	12- clicar em settings
+	13- No espaço "Config vars", inserir:
+			 SPRING_PROFILES_ACTIVE   VALOR: prod
+			 FORUM_DATABASE_URL   VALOR: jdbc:h2:mem:alura-forum
+			 FORUM_DATABASE_USERNAME  VALOR: sa
+			 FORUM_DATABASE_PASSWORD   VALOR: <vazio>
+			 FORUM_JWT_SECRET    VALOR: 123456 (ou a senha criptografada)
+			 PORT  VALOR: 8080
+	14- Rodar o comando para subir o projeto atualizado: heroku container:push web  (Sempre que houver atualização da aplicação)
+	15- Rodar o comando: heroku cointainer:release web
+	16- Rodar o comando: heroku open
+	

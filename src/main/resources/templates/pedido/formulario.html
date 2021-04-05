@@ -1,0 +1,55 @@
+
+<html>
+
+<head th:replace="~{base :: head}"></head>
+
+
+<body>
+<div th:replace="~{base :: logo-sistema }"></div>
+	<div class="container">
+		
+		<div th:replace="~{base :: jumb('Novo Pedido')}"></div>
+		
+			<div class="card">
+			<form th:object="${requisicaoNovoPedido}" class="card-body" th:action="@{/pedido/novo}" enctype="multipart/form-data" method="post">
+				<div class="form-group">
+					<label for="nomePedido">Produto</label>
+					<input th:field="*{nomePedido}" th:errorclass="is-invalid"  class="form-control" placeholder="nome do produto"> 
+					<small>Informe o nome do produto a ser cadastrado</small>
+					<div class="invalid-feedback"  th:errors="*{nomePedido}">
+						Msg de erro ao deixar o campo em branco!
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="urlProduto">Url do Produto</label> <input
+						th:field="*{urlProduto}" th:errorclass="is-invalid"
+						class="form-control" placeholder="Url do produto"> <small>Procure
+						um site que comercialize o produto, cole o link do anúncio aqui!</small>
+					<div class="invalid-feedback" th:errors="*{urlProduto}">Msg
+						de erro ao deixar o campo em branco!</div>
+				</div>
+				<!-- 				<div class="form-group"> -->
+				<!-- 					<label for="urlImagem">Url da imagem</label>  -->
+				<!-- 					<input th:field="*{urlImagem}" th:errorclass="is-invalid"  class="form-control"  placeholder="Url da imagem"> -->
+				<!-- 					<small>Cole a URL da imagem do produto</small> -->
+				<!-- 					<div class="invalid-feedback"  th:errors="*{urlImagem}"> -->
+				<!-- 						Msg de erro ao deixar o campo em branco! -->
+				<!-- 					</div> -->
+
+				<div class="form-group mb-3">
+					<label for="file">Escolha uma foto do produto</label> 
+					<input class="form-control" name="file" type="file" id="file">
+				</div>
+				<div class="form-group">
+					<label  for="descricao">Descição do produto</label>
+					<textarea th:field="*{descricao}" class="form-control" placeholder="Adicione detalhes importantes sobre o produto"> </textarea>
+				</div>
+				<button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Cadastrar</button>
+				<button class="btn btn-outline-primary my-2 my-sm-0" type="reset">Limpar</button>
+			</form>
+		</div>
+
+	</div>
+
+</body>
+</html>

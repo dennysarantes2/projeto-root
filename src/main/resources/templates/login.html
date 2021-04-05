@@ -1,0 +1,34 @@
+
+<html>
+
+<head th:replace="~{base :: head}"></head>
+<body>
+
+	<div th:replace="~{base :: logo-sistema }"></div>
+
+	<div class="container">
+
+		<div th:replace="~{base :: jumb('Login')}"></div>
+
+
+
+		<div class="card mb-3">
+			<div th:if="${param.error}">Usuário ou senha inválidos</div>
+			<!--  <div th:if="${param.logout}">Logout realizado com sucesso</div>-->
+			<form th:action="@{/login}" class="card-body" method="post">
+				<div class="form-group">
+					<label for="username">Usuário</label>
+					<input name="username" class="form-control" placeholder="nome do usuário"> 
+				</div>
+				<div class="form-group">
+					<label for="password">Senha</label>
+					<input class="form-control" type="password" name="password" placeholder="Senha" />
+				</div>
+				<input class="btn btn-primary" type="submit" value="Log in" />
+			</form>
+
+		</div>
+	</div>
+</body>
+
+</html>

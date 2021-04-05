@@ -1,0 +1,62 @@
+<head th:fragment="head">
+<meta charset="UTF-8" />
+<link rel="stylesheet"
+	href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+	integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+	crossorigin="anonymous">
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link
+	href="https://fonts.googleapis.com/css2?family=Handlee&display=swap"
+	rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<style>
+.logo-container {
+	background-color: #696969;
+	color: white;
+}
+
+.nome-sistema {
+	font-family: 'Handlee', cursive;
+	font-size: 2.5rem;
+	color: white !important;
+}
+
+a {
+	text-decoration: none !important;
+}
+</style>
+</head>
+
+<div th:fragment="logo-sistema" class="">
+	<div class="row logo-container mb-3 p-4 d-flex justify-content-between">
+		<a sec:authorize="!isAuthenticated()" href="/login"> <span class="nome-sistema text-decoration-none ml-2">Root-Mudi</span></a>
+		<a sec:authorize="isAuthenticated()" href="/usuario/home"> <span class="nome-sistema text-decoration-none ml-2">Root-Mudi</span> </a> 
+		<span class="mt-3"> 
+			<a sec:authorize="!isAuthenticated()" class="text-light" href="/login">Login</a> 
+			<a onclick="document.querySelector('#form-id').submit()" sec:authorize="isAuthenticated()" class="text-light" href="#">Logout</a>
+			<form id="form-id" th:action="@{/logout}" method="post"></form>
+			 <!--<button th:href="@{/logout}" class="btn btn-light" th:if="${#httpServletRequest.remoteUser} != null">Logout</button>-->
+		</span>
+	</div>
+	<div class="row">
+		<div class="col-12 mb-2">
+			<nav class="nav">
+	 			  
+				    <a sec:authorize="isAuthenticated()" class="nav-link" th:href="@{/usuario}">Meus pedidos</a>
+				    <a sec:authorize="isAuthenticated()" class="nav-link" th:href="@{/oferta}">Faça sua oferta</a>
+				    <a sec:authorize="isAuthenticated()" class="nav-link" th:href="@{/usuario/cadastro}">Cadastro de usuarios</a>
+			</nav>
+
+		</div>
+	</div>
+</div>
+
+<div th:fragment="jumb(titulo)"
+	class="jumbotron bg-info text-white mb-0">
+	<h1 class="display-4" th:text="${titulo}"></h1>
+	<h6 sec:authorize="isAuthenticated()" th:inline="text">Olá,
+		[[${#httpServletRequest.remoteUser}]]!</h6>
+</div>

@@ -1,0 +1,211 @@
+
+<html>
+<head th:replace="~{base :: head}"></head>
+<body>
+	<script>
+		function onClickSelect() {
+			window.alert("Estamos aqui!");
+			confirm("Precione um botão")
+			document.getElementById("teste").innerHTML = "teste-alert";
+		};
+	</script>
+	<div th:replace="~{base :: logo-sistema }"></div>
+
+	<div class="container">
+		
+		<div th:replace="~{base :: jumb('Meus Pedidos')}"></div>
+		
+		
+		<nav
+			class="navbar navbar-expand navbar-light bg-light d-flex justify-content-between mb-3">
+			<div class="navbar-nav">
+				<a th:classappend="${status} == null ? 'active'"class="nav-item nav-link " th:href="@{/usuario/home}">Todos</a> 
+				<a th:classappend="${status} == 'aguardando' ? 'active'" class="nav-item nav-link" th:href="@{/usuario/status/aguardando}">Aguardando</a> 
+				<a th:classappend="${status} == 'aprovado' ? 'active'" class="nav-item nav-link" th:href="@{/usuario/status/aprovado}">Aprovado</a>
+				<a th:classappend="${status} == 'entregue' ? 'active'" class="nav-item nav-link" th:href="@{/usuario/status/entregue}">Entregue</a>
+			
+			</div>
+			<div class="navbar-nav">
+			<form action="@{usuario/orderBy}" method="GET">
+				<div class="my-sm-0">
+					<select name="orderby" class="form-control text-gray-soft">
+						<option value="">Ordenar por...</option>
+						<option value="asc" id='opt1'>A->Z</option>
+						<option value="desc" id='opt2'>Z->A</option>
+						<option value="Id" id='opt3' th:onclick="onClickExcluir()">Data de cadastro</option>
+						<option id="teste" ></option>
+					</select>
+				</div>
+			</form>
+			<a href="/pedido/formulario"><button
+					class="btn btn-outline-primary ml-2 my-2 my-sm-0">Novo</button></a>
+			</div>
+		</nav>
+		
+		<div class="card mb-3" th:each="pedido : ${pedidos}">
+		
+			<th:block th:switch="${pedido.status.name()}">
+			<div  id="nome" th:case="'AGUARDANDO'" class="card-header alert-warning" th:data-nome="${pedido.nomeProduto}" th:text="${pedido.nomeProduto}">Nome
+			</div>
+			<div  th:case="'APROVADO'" class="card-header alert-success" th:text="${pedido.nomeProduto}">Nome</div>
+			<div  th:case="'ENTREGUE'" class="card-header alert-dark" th:text="${pedido.nomeProduto}">Nome do produto</div>
+			<nav class="mt-2">
+<!-- 			<a id="btn-editar"><button th:onClick="'javascript:setaDadosModal(' + ${pedido.nomeProduto} + ');'" data-toggle="modal" data-target="#modal"  type="button" class="btn btn-outline-primary my-2 my-sm-0" data-bs-toggle="modal" data-bs-target="#staticBackdrop" >Editar</button></a> -->
+			
+			<a id="btn-editar">
+			<button th:onClick="'javascript:setaDadosModal(' + ${pedido.id} + ')'" data-toggle="modal" data-target="#modal" class="btn btn-outline-primary my-2 my-sm-0">Editar</button></a>
+			
+			<a id="btn-excluir"><button th:onClick="'javascript:onClickExcluir(' + ${pedido.id} + ');'" class="btn btn-outline-primary my-2 my-sm-0">Excluir</button></a>
+			<a id="btn-excluir"><button th:onClick="'javascript:teste();'" class="btn btn-outline-primary my-2 my-sm-0">Teste</button></a>
+			</nav>
+				
+					
+				<div class="card-body">
+				<div class="row">
+
+					<div class="col-12 col-sm-4">
+						<div>
+							<img class="img-thumbnail" th:src="${pedido.urlImagemLocal}" />
+<!-- 								<img src="imagem" />  -->
+						</div>
+						
+					</div>
+					<div class="col-12 col-sm-8 mb-3">
+						<div class="row">
+							<div class="col-md-5">
+								Valor: 
+								<span th:if="${pedido.valorNegociado} != null" th:text="${' R$ ' + #numbers.formatDecimal(pedido.valorNegociado,3,'POINT',2,'COMMA')}">200,99</span>
+							</div>
+							<div class="col-md-7">
+								Data da entrega: 
+								<span th:text="${#temporals.format(pedido.dataEntrega, 'dd/MM/yyyy')}"></span>
+							</div>
+						</div>
+						<div>Link do produto:</div>
+						<div>
+							<input class="form-control" th:value="${pedido.urlProduto}"
+								value="url do produto" />
+						</div>
+						<div>Descrição</div>
+						<div>
+							<textarea class="form-control" th:text="${pedido.descricao}">descrição do pedido</textarea>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+
+
+	<!-- Modal -->
+	<div class="modal fade" id="modal" data-bs-backdrop="static"
+		data-bs-keyboard="false" tabindex="-1"
+		aria-labelledby="staticBackdropLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="staticBackdropLabel">Editar pedido</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					
+					<div class="card">
+						<form th:object="${requisicaoNovoPedido}" class="card-body">
+						<div id="idProduto-modal" data-id="" class="form-group">
+							<label for="nomePedido">Nome do produto:</label>
+							<input name="nomeProduto" data-nomeAtual="" id="nomeProduto-modal" class="form-control" placeholder="Nome do produto"> 
+							<small>Informe um novo nome, caso queira alterar o atual</small>
+							<p ></p>
+							<label for="linkProduto">Link do produto:</label>
+							<input data-linkAtual="" id="linkProduto-modal" class="form-control" placeholder="Url do produto"> 
+							<small>Informe um novo link, caso queira alterar o atual</small>
+						</div>				
+							<button th:onClick="'javascript:editarPedido()'" class="btn btn-outline-primary my-2 my-sm-0">Editar pedido</button>
+							<button class="btn btn-outline-primary my-2 my-sm-0" type="reset">Limpar</button>
+						</form>
+					</div>
+<!-- 					<p id="resultado-modal">Nome produto:</p> -->
+				</div>
+				
+				<div class="modal-footer">
+<!-- 					<button type="button" class="btn btn-secondary" -->
+<!-- 						data-bs-dismiss="modal">Cancelar edição</button> -->
+<!-- 					<button type="button" class="btn btn-primary">Salvar</button> -->
+				</div>
+			</div>
+		</div>
+	</div>
+TESTE
+	<div>
+		<img class="img-thumbnail" th:src="@{/static/imagens/calca.jpg}"/>
+	</div>
+
+	<script type="text/javascript">
+		function onClickExcluir(idPedido){
+			
+			if (confirm("Tem certeza que deseja excluir esse pedido?")) {
+				
+				alert("O valor do id é " +  idPedido);
+				//window.location.href="/pedido/excluirPedido/" + idpedido;
+				return window.location.href = ('/pedido/excluirPedido/' + idPedido);
+				
+			  } else {
+			    alert("ok");
+			  }
+		}
+		
+		function setaDadosModal(id) {
+			var modalNomeProduto = document.getElementById("nomeProduto-modal");
+			var modalLinkProduto = document.getElementById("linkProduto-modal");
+			var modalIdProduto = document.getElementById("idProduto-modal");
+			
+			axios.get('http://localhost:8082/api/pedidos/'+ id).then(resp => {
+				//console.log(resp.data);
+			    var pedido = resp.data;
+			    modalNomeProduto.placeholder = pedido.nomeProduto;
+			    modalNomeProduto.dataset.nomeAtual = pedido.nomeProduto;
+			    modalLinkProduto.placeholder = pedido.urlProduto;
+			    modalLinkProduto.dataset.linkAtual = pedido.urlProduto;
+			    modalIdProduto.dataset.id = id;
+			});
+		}
+		
+		function editarPedido(){
+			var nomeProduto = document.getElementById("nomeProduto-modal").value;
+			var linkProduto = document.getElementById("linkProduto-modal").value;
+			var idProduto =   document.getElementById("idProduto-modal").dataset.id;
+			var nomeAtual =   document.getElementById("nomeProduto-modal").dataset.nomeAtual;
+			var linkAtual =   document.getElementById("linkProduto-modal").dataset.linkAtual;
+			
+			if (nomeProduto=="" && linkProduto=="" ){
+				alert("Nenhuma alteração foi efetuada!")
+				return;
+			}
+			
+			if(nomeProduto==""){
+				alert("O nome não foi alterado");
+				nomeProduto = nomeAtual;
+				}
+			
+			if(linkProduto=="" ){
+				alert( "O LINK não foi alterado");
+				linkProduto = linkAtual;
+				}
+			
+			axios.post('http://localhost:8082/api/pedidos/editar', {
+				id: idProduto,
+				nomePedido: nomeProduto,
+				urlProduto: linkProduto,			
+			});
+			
+		}
+		
+		
+		
+	</script>
+	<script type="text/javascript" th:src="@{static/js/teste.js}"></script>
+</body>
+</html>
